@@ -771,8 +771,10 @@ async function openBook(book) {
   document.getElementById('pdf-canvas').style.display = 'none';
 
   try {
-    const url = `/mnt/user-data/uploads/${book.file}`;
-    const loadingTask = pdfjsLib.getDocument(url);
+    const url = encodeURIComponent(book.file).replace(/%2F/g, '/');
+    const baseUrl = window.location.href.replace(/\/[^\/]*$/, '/');
+    const fullUrl = baseUrl + url;
+    const loadingTask = pdfjsLib.getDocument(fullUrl);
     currentPdf = await loadingTask.promise;
     totalPages = currentPdf.numPages;
     currentPage = 1;
