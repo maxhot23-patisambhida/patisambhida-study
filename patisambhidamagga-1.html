@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ปฏิสัมภิทามรรค — คลังการศึกษา</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@300;400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  :root {
+    --gold-deep:    #8B6914;
+    --gold-mid:     #C9922A;
+    --gold-bright:  #E8B84B;
+    --gold-pale:    #F5DFA0;
+    --gold-glow:    #FDF3D0;
+    --brown-dark:   #2A1A08;
+    --brown-mid:    #4A2E10;
+    --brown-light:  #7A4E28;
+    --cream:        #FAF3E0;
+    --cream-dark:   #EFE3C2;
+    --text-main:    #2A1A08;
+    --text-mid:     #5C3D1A;
+    --text-light:   #8B6538;
+    --border:       rgba(139,105,20,0.25);
+    --shadow:       rgba(42,26,8,0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans Thai', sans-serif;
+    background: var(--brown-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ═══ BACKGROUND TEXTURE ═══ */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(201,146,42,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(139,105,20,0.10) 0%, transparent 50%),
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 40px,
+        rgba(201,146,42,0.015) 40px,
+        rgba(201,146,42,0.015) 41px
+      );
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ═══ HEADER ═══ */
+  header {
+    position: relative; z-index: 10;
+    background: linear-gradient(180deg, #1A0F04 0%, var(--brown-dark) 100%);
+    border-bottom: 1px solid var(--gold-mid);
+    padding: 0;
+  }
+  .header-inner {
+    max-width: 1400px; margin: 0 auto;
+    padding: 24px 32px 20px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .dharma-wheel {
+    width: 56px; height: 56px;
+    flex-shrink: 0;
+  }
+  .dharma-wheel svg { width: 100%; height: 100%; }
+  .header-titles { flex: 1; }
+  .header-titles .subtitle {
+    font-family: 'Cinzel', serif;
+    font-size: 11px; letter-spacing: 4px;
+    color: var(--gold-mid); text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .header-titles h1 {
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 26px; font-weight: 700;
+    color: var(--gold-bright);
+    line-height: 1.2;
+    text-shadow: 0 2px 12px rgba(232,184,75,0.3);
+  }
+  .header-titles .tagline {
+    font-size: 12px; color: var(--gold-pale);
+    margin-top: 4px; opacity: 0.7;
+  }
+  .header-search {
+    display: flex; align-items: center; gap: 0;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 8px; overflow: hidden;
+  }
+  .header-search input {
+    background: transparent; border: none; outline: none;
+    padding: 10px 16px; width: 240px;
+    font-family: 'Noto Sans Thai', sans-serif;
+    font-size: 14px; color: var(--gold-pale);
+  }
+  .header-search input::placeholder { color: rgba(245,223,160,0.35); }
+  .header-search button {
+    background: var(--gold-mid); border: none; cursor: pointer;
+    padding: 10px 16px; color: var(--brown-dark);
+    font-size: 16px; transition: background 0.2s;
+  }
+  .header-search button:hover { background: var(--gold-bright); }
+
+  /* ═══ ORNAMENT BAR ═══ */
+  .ornament-bar {
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold-deep), var(--gold-bright), var(--gold-mid), var(--gold-bright), var(--gold-deep), transparent);
+  }
+
+  /* ═══ LAYOUT ═══ */
+  .app-layout {
+    position: relative; z-index: 1;
+    display: flex; max-width: 1400px; margin: 0 auto;
+    padding: 0; min-height: calc(100vh - 110px);
+  }
+
+  /* ═══ SIDEBAR ═══ */
+  .sidebar {
+    width: 300px; flex-shrink: 0;
+    background: linear-gradient(180deg, rgba(26,15,4,0.95) 0%, rgba(42,26,8,0.98) 100%);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    position: sticky; top: 0; height: calc(100vh - 110px);
+    overflow-y: auto;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--gold-deep); border-radius: 2px; }
+
+  .sidebar-section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; letter-spacing: 3px;
+    color: var(--gold-mid); text-transform: uppercase;
+    padding: 0 20px 10px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+
+  .book-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 20px; cursor: pointer;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+  }
+  .book-item:hover {
+    background: rgba(201,146,42,0.08);
+    border-left-color: var(--gold-deep);
+  }
+  .book-item.active {
+    background: rgba(201,146,42,0.14);
+    border-left-color: var(--gold-bright);
+  }
+  .book-num {
+    width: 28px; height: 28px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--gold-deep), var(--gold-mid));
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif; font-size: 11px;
+    color: var(--cream); font-weight: 600;
+  }
+  .book-item.active .book-num {
+    background: linear-gradient(135deg, var(--gold-mid), var(--gold-bright));
+  }
+  .book-info { flex: 1; min-width: 0; }
+  .book-title {
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 13px; font-weight: 600;
+    color: var(--gold-pale); line-height: 1.4;
+  }
+  .book-item.active .book-title { color: var(--gold-bright); }
+  .book-sub {
+    font-size: 11px; color: var(--text-light);
+    margin-top: 2px; line-height: 1.3;
+  }
+
+  /* ═══ DIVIDER ═══ */
+  .sidebar-divider {
+    margin: 16px 20px;
+    border: none; border-top: 1px solid var(--border);
+  }
+
+  /* ═══ MAIN CONTENT ═══ */
+  .main-content {
+    flex: 1; display: flex; flex-direction: column;
+    background: var(--cream);
+    min-width: 0;
+  }
+
+  /* Welcome screen */
+  .welcome-screen {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 60px 40px;
+    background: linear-gradient(160deg, #FAF3E0 0%, #EFE3C2 100%);
+  }
+  .welcome-inner { text-align: center; max-width: 560px; }
+  .welcome-lotus {
+    font-size: 64px; margin-bottom: 24px;
+    filter: drop-shadow(0 4px 16px rgba(139,105,20,0.3));
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  .welcome-inner h2 {
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 28px; font-weight: 700;
+    color: var(--gold-deep); margin-bottom: 12px;
+  }
+  .welcome-inner p {
+    font-size: 15px; color: var(--text-mid);
+    line-height: 1.8; margin-bottom: 8px;
+  }
+  .welcome-hint {
+    margin-top: 28px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    color: var(--text-light); font-size: 13px;
+  }
+  .welcome-hint::before, .welcome-hint::after {
+    content: ''; flex: 1; max-width: 60px;
+    height: 1px; background: var(--border);
+  }
+
+  /* PDF Viewer */
+  .pdf-viewer-area { display: none; flex: 1; flex-direction: column; }
+  .pdf-viewer-area.active { display: flex; }
+
+  .viewer-toolbar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 20px;
+    background: linear-gradient(180deg, #2A1A08 0%, #3A2310 100%);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .viewer-title {
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 14px; font-weight: 600;
+    color: var(--gold-pale); flex: 1; min-width: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .toolbar-btn {
+    background: rgba(201,146,42,0.15);
+    border: 1px solid var(--border);
+    color: var(--gold-pale); cursor: pointer;
+    padding: 7px 14px; border-radius: 6px;
+    font-size: 13px; font-family: 'Noto Sans Thai', sans-serif;
+    transition: all 0.2s; white-space: nowrap;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .toolbar-btn:hover {
+    background: rgba(201,146,42,0.3);
+    border-color: var(--gold-mid);
+    color: var(--gold-bright);
+  }
+  .toolbar-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .page-info {
+    font-size: 13px; color: var(--gold-pale);
+    padding: 6px 12px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 6px; border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .zoom-controls { display: flex; align-items: center; gap: 6px; }
+  .zoom-btn {
+    width: 32px; height: 32px;
+    background: rgba(201,146,42,0.15);
+    border: 1px solid var(--border);
+    color: var(--gold-pale); cursor: pointer;
+    border-radius: 6px; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .zoom-btn:hover { background: rgba(201,146,42,0.3); color: var(--gold-bright); }
+  .zoom-level {
+    font-size: 12px; color: var(--gold-pale);
+    min-width: 40px; text-align: center;
+  }
+
+  .pdf-canvas-wrap {
+    flex: 1; overflow: auto;
+    background: #3A3028;
+    display: flex; justify-content: center;
+    padding: 24px;
+  }
+  .pdf-canvas-wrap::-webkit-scrollbar { width: 6px; height: 6px; }
+  .pdf-canvas-wrap::-webkit-scrollbar-track { background: #2A2018; }
+  .pdf-canvas-wrap::-webkit-scrollbar-thumb { background: var(--gold-deep); border-radius: 3px; }
+
+  #pdf-canvas {
+    display: block;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    border-radius: 2px;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .pdf-loading {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 16px; color: var(--gold-pale);
+    font-size: 14px; padding: 60px;
+  }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid rgba(201,146,42,0.2);
+    border-top-color: var(--gold-mid);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ═══ RIGHT PANEL — Glossary ═══ */
+  .right-panel {
+    width: 280px; flex-shrink: 0;
+    background: linear-gradient(180deg, rgba(26,15,4,0.97) 0%, rgba(42,26,8,0.99) 100%);
+    border-left: 1px solid var(--border);
+    display: flex; flex-direction: column;
+  }
+  .panel-header {
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+  }
+  .panel-header h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; letter-spacing: 3px;
+    color: var(--gold-mid); text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .panel-search {
+    display: flex; gap: 0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+  }
+  .panel-search input {
+    flex: 1; background: transparent; border: none; outline: none;
+    padding: 8px 12px; color: var(--gold-pale);
+    font-family: 'Noto Sans Thai', sans-serif; font-size: 13px;
+  }
+  .panel-search input::placeholder { color: rgba(245,223,160,0.3); }
+  .panel-search button {
+    background: var(--gold-deep); border: none; cursor: pointer;
+    padding: 8px 12px; color: var(--cream); font-size: 14px;
+    transition: background 0.2s;
+  }
+  .panel-search button:hover { background: var(--gold-mid); }
+
+  .glossary-list {
+    flex: 1; overflow-y: auto; padding: 12px 0;
+  }
+  .glossary-list::-webkit-scrollbar { width: 3px; }
+  .glossary-list::-webkit-scrollbar-thumb { background: var(--gold-deep); }
+
+  .glossary-item {
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(139,105,20,0.1);
+    cursor: pointer; transition: background 0.15s;
+  }
+  .glossary-item:hover { background: rgba(201,146,42,0.07); }
+  .glossary-item.expanded { background: rgba(201,146,42,0.1); }
+  .g-pali {
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 14px; font-weight: 600;
+    color: var(--gold-bright); margin-bottom: 2px;
+  }
+  .g-thai {
+    font-size: 12px; color: var(--gold-pale);
+  }
+  .g-meaning {
+    display: none; margin-top: 10px;
+    padding: 10px; border-radius: 6px;
+    background: rgba(245,223,160,0.06);
+    border-left: 2px solid var(--gold-deep);
+  }
+  .glossary-item.expanded .g-meaning { display: block; }
+  .g-meaning p {
+    font-size: 12px; color: var(--gold-glow);
+    line-height: 1.7;
+  }
+  .g-meaning .g-etymology {
+    margin-top: 6px; font-size: 11px;
+    color: var(--text-light); font-style: italic;
+  }
+
+  /* AI Search result */
+  .ai-result {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.15);
+  }
+  .ai-result-title {
+    font-size: 10px; letter-spacing: 2px;
+    color: var(--gold-mid); text-transform: uppercase;
+    margin-bottom: 8px; font-family: 'Cinzel', serif;
+  }
+  .ai-result-text {
+    font-size: 12px; color: var(--gold-glow);
+    line-height: 1.7;
+  }
+  .ai-loading {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: var(--text-light);
+  }
+  .ai-loading .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold-mid);
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+  .ai-loading .dot:nth-child(2) { animation-delay: 0.2s; }
+  .ai-loading .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes pulse { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+
+  /* ═══ FOOTER ═══ */
+  footer {
+    position: relative; z-index: 1;
+    background: var(--brown-dark);
+    border-top: 1px solid var(--border);
+    padding: 14px 32px;
+    text-align: center;
+    color: var(--text-light); font-size: 12px;
+  }
+  footer span { color: var(--gold-deep); }
+
+  /* ═══ RESPONSIVE ═══ */
+  @media (max-width: 900px) {
+    .right-panel { display: none; }
+  }
+  @media (max-width: 660px) {
+    .sidebar { width: 56px; }
+    .book-info, .book-sub, .sidebar-section-title { display: none; }
+    .book-item { padding: 10px; justify-content: center; }
+    .header-search { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="dharma-wheel">
+      <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="28" cy="28" r="26" stroke="#C9922A" stroke-width="1.5" fill="none" opacity="0.5"/>
+        <circle cx="28" cy="28" r="20" stroke="#E8B84B" stroke-width="1" fill="none"/>
+        <circle cx="28" cy="28" r="5" fill="#C9922A"/>
+        <circle cx="28" cy="28" r="3" fill="#E8B84B"/>
+        <!-- 8 spokes -->
+        <line x1="28" y1="23" x2="28" y2="8" stroke="#C9922A" stroke-width="1.5"/>
+        <line x1="28" y1="33" x2="28" y2="48" stroke="#C9922A" stroke-width="1.5"/>
+        <line x1="23" y1="28" x2="8" y2="28" stroke="#C9922A" stroke-width="1.5"/>
+        <line x1="33" y1="28" x2="48" y2="28" stroke="#C9922A" stroke-width="1.5"/>
+        <line x1="24.4" y1="24.4" x2="13.7" y2="13.7" stroke="#C9922A" stroke-width="1.5"/>
+        <line x1="31.6" y1="31.6" x2="42.3" y2="42.3" stroke="#C9922A" stroke-width="1.5"/>
+        <line x1="31.6" y1="24.4" x2="42.3" y2="13.7" stroke="#C9922A" stroke-width="1.5"/>
+        <line x1="24.4" y1="31.6" x2="13.7" y2="42.3" stroke="#C9922A" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <div class="header-titles">
+      <div class="subtitle">Khuddaka Nikāya · Abhidhamma</div>
+      <h1>ปฏิสัมภิทามรรค</h1>
+      <div class="tagline">คลังการศึกษาพระไตรปิฎก — Paṭisambhidāmagga Study</div>
+    </div>
+    <div class="header-search">
+      <input type="text" id="header-search-input" placeholder="ค้นหาคำบาลี...">
+      <button onclick="searchGlossary()">🔍</button>
+    </div>
+  </div>
+  <div class="ornament-bar"></div>
+</header>
+
+<div class="app-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section-title">คัมภีร์ทั้งหมด</div>
+
+    <div id="book-list">
+      <!-- Populated by JS -->
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- Welcome -->
+    <div class="welcome-screen" id="welcome-screen">
+      <div class="welcome-inner">
+        <div class="welcome-lotus">🪷</div>
+        <h2>ยินดีต้อนรับสู่<br>ปฏิสัมภิทามรรค</h2>
+        <p>คัมภีร์แห่งหนทางแห่งปัญญาแตกฉาน<br>หนึ่งในขุทกนิกาย พระสุตตันตปิฎก</p>
+        <p style="font-size:13px; color: var(--text-light);">เลือกคัมภีร์จากรายการด้านซ้ายเพื่อเริ่มอ่าน</p>
+        <div class="welcome-hint">กรุณาเลือกคัมภีร์เพื่อเริ่มต้นการศึกษา</div>
+      </div>
+    </div>
+
+    <!-- PDF Viewer -->
+    <div class="pdf-viewer-area" id="pdf-viewer-area">
+      <div class="viewer-toolbar">
+        <div class="viewer-title" id="viewer-title">—</div>
+        <button class="toolbar-btn" id="btn-prev" onclick="changePage(-1)">◀ ก่อนหน้า</button>
+        <div class="page-info" id="page-info">หน้า — / —</div>
+        <button class="toolbar-btn" id="btn-next" onclick="changePage(1)">ถัดไป ▶</button>
+        <div class="zoom-controls">
+          <button class="zoom-btn" onclick="changeZoom(-0.15)">−</button>
+          <div class="zoom-level" id="zoom-level">100%</div>
+          <button class="zoom-btn" onclick="changeZoom(0.15)">+</button>
+        </div>
+      </div>
+      <div class="pdf-canvas-wrap" id="pdf-canvas-wrap">
+        <div class="pdf-loading" id="pdf-loading">
+          <div class="spinner"></div>
+          <span>กำลังโหลดคัมภีร์...</span>
+        </div>
+        <canvas id="pdf-canvas" style="display:none;"></canvas>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- RIGHT PANEL -->
+  <aside class="right-panel">
+    <div class="panel-header">
+      <h3>พจนานุกรมบาลี-ไทย</h3>
+      <div class="panel-search">
+        <input type="text" id="glossary-input" placeholder="ค้นหาหรือถาม AI..." onkeydown="if(event.key==='Enter')searchGlossaryPanel()">
+        <button onclick="searchGlossaryPanel()">⇒</button>
+      </div>
+    </div>
+
+    <div class="glossary-list" id="glossary-list">
+      <!-- Built by JS -->
+    </div>
+
+    <div class="ai-result" id="ai-result" style="display:none;">
+      <div class="ai-result-title">✦ คำอธิบาย AI</div>
+      <div class="ai-result-text" id="ai-result-text"></div>
+    </div>
+  </aside>
+
+</div>
+
+<footer>
+  <span>ปฏิสัมภิทามรรค</span> · คลังการศึกษา · จัดทำเพื่อการศึกษาพระธรรม
+</footer>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ══════════════════════════════
+// BOOK CATALOGUE
+// ══════════════════════════════
+const books = [
+  {
+    id: 1,
+    num: "ปฏ ๑",
+    title: "ญาณนิทเทส มาติกา ๗๓",
+    subtitle: "ภาคที่ ๑",
+    file: "ปฏ__๑_ญาณ_ทเทส_มาต_กา_๗๓_เพ__อการศ_กษา_2_.pdf"
+  },
+  {
+    id: 2,
+    num: "ปฏ ๑",
+    title: "ญาณนิทเทส มาติกา ๗๓",
+    subtitle: "ภาคที่ ๒",
+    file: "ปฏ__๑_ญาณ_ทเทส_มาต_กา_๗๓_เพ__อการศ_กษา_2___1_.pdf"
+  },
+  {
+    id: 3,
+    num: "ปฏ ๒",
+    title: "อภิญเญยยนิทเทส",
+    subtitle: "สุตมยอภิญเญยย ๑",
+    file: "อภ_ญเญยยน_ทเทส_๑__เปล__ยนช__อจาก_ปฏ_๒_ส_ตมย_อภ_ญเญยย_.pdf"
+  },
+  {
+    id: 4,
+    num: "ปฏ ๓",
+    title: "สุตมยอภิญเญยย ๒",
+    subtitle: "ทุติยภาณวาระ",
+    file: "ปฏ_๓_ส_ตมย_อภ_ญเญยย๒_ท_ตยภาณวาระ__จ_ดช_องบร.pdf"
+  },
+  {
+    id: 5,
+    num: "ปฏ ๔",
+    title: "สุตมยปริญเญยยนิทเทส",
+    subtitle: "ที่ ๒",
+    file: "ปฏ__๔_ส_ตมย_ปร_ญเญยยน_ทเทส_ท___๒__๑๔_ตค_๖๗__1_.pdf"
+  },
+  {
+    id: 6,
+    num: "ปฏ ๕",
+    title: "สุต-ปหาตัพพะนิทเทส ๑",
+    subtitle: "รวมไฟล์ ๑-๒-๓",
+    file: "ปฏ__๕_ส_ต_ปหาต_พพะ_น_ทเทส_๑_ตรวจแล_ว_รวมไฟล__๑-๒-๓_.pdf"
+  },
+  {
+    id: 7,
+    num: "ปฏ ๖",
+    title: "ปหาตัพพนิทเทส",
+    subtitle: "ทุติยภาณวาระ เล่ม ๑",
+    file: "ปฏ__๖_ปหาต_พพน_ทเทส_ท_ต_ยภาณวาระ__เล_ม_๑__1_.pdf"
+  },
+  {
+    id: 8,
+    num: "ปฏ ๗",
+    title: "ปหาตัพพะทุติยะ",
+    subtitle: "ภาค ๒",
+    file: "ปฏ__๗_ปหาต_พพะ_ทต_ยะ_ภาค๒.pdf"
+  },
+  {
+    id: 9,
+    num: "ปฏ ๘",
+    title: "ปหาตัพพะทุติยะ",
+    subtitle: "ภาค ๓ (จบ)",
+    file: "ปฏ__๘_ปหาต_พพะ_ท_ต_ยะ_ภาค_๓_จบ.pdf"
+  }
+];
+
+// ══════════════════════════════
+// PALI GLOSSARY
+// ══════════════════════════════
+const glossaryData = [
+  {
+    pali: "ปฏิสัมภิทา",
+    thai: "ความแตกฉาน, ปัญญาแตกฉาน",
+    meaning: "ความรู้แตกฉาน ๔ ประการ ได้แก่ อัตถปฏิสัมภิทา ธัมมปฏิสัมภิทา นิรุตติปฏิสัมภิทา และปฏิภาณปฏิสัมภิทา เป็นคุณสมบัติพิเศษของพระอริยบุคคล",
+    etymology: "ปฏิ (ประกอบ) + สํ (รวม) + ภิทา (ความแตก) = ความแตกฉานประกอบรวมกัน"
+  },
+  {
+    pali: "ญาณ",
+    thai: "ความรู้, ปัญญา",
+    meaning: "ความรู้ที่เกิดจากการพิจารณาด้วยปัญญา มีหลายระดับตั้งแต่โลกิยญาณจนถึงโลกุตรญาณ ในปฏิสัมภิทามรรคแสดงไว้ถึง ๗๓ ญาณ",
+    etymology: "√ñā (รู้) + อน ปัจจัย = สิ่งที่รู้ได้"
+  },
+  {
+    pali: "มาติกา",
+    thai: "แม่บท, หัวข้อ, สารบัญ",
+    meaning: "แม่บทหรือหัวข้อสำคัญที่ใช้จัดระบบหมวดหมู่ธรรม เปรียบเสมือนสารบัญหลักที่ขยายความต่อไป",
+    etymology: "√mā (วัด) + tikā = สิ่งที่ใช้วัดหรือกำหนดขอบเขต"
+  },
+  {
+    pali: "อภิญเญยย",
+    thai: "พึงรู้ยิ่ง, ควรรู้ด้วยอภิญญา",
+    meaning: "สิ่งที่ควรรู้ด้วยปัญญาอันยิ่ง หมายถึงธรรมที่ควรทำความเข้าใจอย่างลึกซึ้งด้วยวิปัสสนาปัญญา",
+    etymology: "อภิ (ยิ่ง) + ñeyya (พึงรู้)"
+  },
+  {
+    pali: "ปริญเญยย",
+    thai: "พึงกำหนดรู้",
+    meaning: "สิ่งที่ควรกำหนดรู้ด้วยการพิจารณาไตรลักษณ์ คือ อนิจจัง ทุกขัง อนัตตา เพื่อถอนอุปาทาน",
+    etymology: "ปริ (รอบ) + ñeyya (พึงรู้) = พึงรู้รอบด้าน"
+  },
+  {
+    pali: "ปหาตัพพ",
+    thai: "พึงละ, ควรละทิ้ง",
+    meaning: "กิเลสหรือธรรมที่ควรละด้วยโสดาปัตติมรรคเป็นต้น โดยมีทั้งปหาตัพพะด้วยทัสสนะและด้วยภาวนา",
+    etymology: "ป (ทิ้ง) + หา (ละ) + ตัพพ (ควร) = ควรละทิ้งออกไป"
+  },
+  {
+    pali: "สุตมย",
+    thai: "สำเร็จด้วยการฟัง",
+    meaning: "ปัญญาที่เกิดจากการฟังธรรม เป็นขั้นแรกของปัญญา ๓ คือ สุตมยปัญญา จินตามยปัญญา ภาวนามยปัญญา",
+    etymology: "สุต (ฟัง) + มย (สำเร็จด้วย) = สำเร็จมาจากการฟัง"
+  },
+  {
+    pali: "ภาณวาระ",
+    thai: "วาระการสวด, ส่วนการสาธยาย",
+    meaning: "ส่วนย่อยของคัมภีร์ที่แบ่งตามปริมาณการสวดในหนึ่งวาระ มีทั้งปฐมภาณวาระและทุติยภาณวาระ",
+    etymology: "ภาณ (สวด) + วาระ (คราว) = คราวหนึ่งของการสวด"
+  },
+  {
+    pali: "วิปัสสนา",
+    thai: "การเห็นแจ้ง, การพิจารณาวิเศษ",
+    meaning: "การเห็นแจ้งสภาวธรรมตามความเป็นจริงด้วยปัญญา โดยพิจารณาไตรลักษณ์อย่างต่อเนื่อง จนเกิดวิปัสสนาญาณลำดับต่างๆ",
+    etymology: "วิ (พิเศษ) + ปสฺสนา (การเห็น) = การเห็นอย่างพิเศษ"
+  },
+  {
+    pali: "สมาธิ",
+    thai: "ความตั้งมั่น, ความสงบ",
+    meaning: "ความตั้งมั่นแห่งจิต เป็นเอกัคคตาเจตสิก มีทั้งอุปจารสมาธิและอัปปนาสมาธิ เป็นบาทแห่งวิปัสสนา",
+    etymology: "สํ (ดี) + อาธิ (ตั้ง) = ตั้งไว้อย่างดี"
+  },
+  {
+    pali: "อนิจจัง",
+    thai: "ความไม่เที่ยง",
+    meaning: "ลักษณะที่สิ่งทั้งปวงเกิดขึ้นและดับไป ไม่คงทนถาวร เป็นหนึ่งในไตรลักษณ์ การเห็นอนิจจังนำสู่วิราคะ",
+    etymology: "อน (ไม่) + อิจจ (เที่ยง) = ไม่เที่ยง"
+  },
+  {
+    pali: "นิโรธ",
+    thai: "ความดับ, การดับทุกข์",
+    meaning: "การดับแห่งทุกข์ คือนิพพาน เป็นอริยสัจข้อที่ ๓ หมายถึงการดับตัณหาอย่างสิ้นเชิง",
+    etymology: "นิ (ออก) + รุธ (กั้น) = ดับออกโดยสิ้นเชิง"
+  }
+];
+
+// ══════════════════════════════
+// STATE
+// ══════════════════════════════
+let currentPdf = null;
+let currentPage = 1;
+let totalPages = 0;
+let currentZoom = 1.2;
+let currentBookId = null;
+let isRendering = false;
+
+// ══════════════════════════════
+// BUILD SIDEBAR
+// ══════════════════════════════
+function buildSidebar() {
+  const list = document.getElementById('book-list');
+  list.innerHTML = '';
+  books.forEach(book => {
+    const el = document.createElement('div');
+    el.className = 'book-item';
+    el.id = `book-${book.id}`;
+    el.onclick = () => openBook(book);
+    el.innerHTML = `
+      <div class="book-num">${book.id}</div>
+      <div class="book-info">
+        <div class="book-title">${book.title}</div>
+        <div class="book-sub">${book.num} · ${book.subtitle}</div>
+      </div>
+    `;
+    list.appendChild(el);
+  });
+}
+
+// ══════════════════════════════
+// BUILD GLOSSARY
+// ══════════════════════════════
+function buildGlossary(data) {
+  const list = document.getElementById('glossary-list');
+  list.innerHTML = '';
+  data.forEach((item, i) => {
+    const el = document.createElement('div');
+    el.className = 'glossary-item';
+    el.onclick = () => el.classList.toggle('expanded');
+    el.innerHTML = `
+      <div class="g-pali">${item.pali}</div>
+      <div class="g-thai">${item.thai}</div>
+      <div class="g-meaning">
+        <p>${item.meaning}</p>
+        ${item.etymology ? `<p class="g-etymology">นิรุกติ: ${item.etymology}</p>` : ''}
+      </div>
+    `;
+    list.appendChild(el);
+  });
+}
+
+// ══════════════════════════════
+// OPEN BOOK
+// ══════════════════════════════
+async function openBook(book) {
+  // Update active state
+  document.querySelectorAll('.book-item').forEach(el => el.classList.remove('active'));
+  document.getElementById(`book-${book.id}`).classList.add('active');
+  currentBookId = book.id;
+
+  // Show PDF area
+  document.getElementById('welcome-screen').style.display = 'none';
+  document.getElementById('pdf-viewer-area').classList.add('active');
+  document.getElementById('viewer-title').textContent = `${book.num} · ${book.title} — ${book.subtitle}`;
+
+  // Show loading
+  document.getElementById('pdf-loading').style.display = 'flex';
+  document.getElementById('pdf-canvas').style.display = 'none';
+
+  try {
+    const url = `/mnt/user-data/uploads/${book.file}`;
+    const loadingTask = pdfjsLib.getDocument(url);
+    currentPdf = await loadingTask.promise;
+    totalPages = currentPdf.numPages;
+    currentPage = 1;
+    await renderPage(currentPage);
+  } catch (err) {
+    document.getElementById('pdf-loading').innerHTML = `
+      <div style="color:#E8B84B; text-align:center;">
+        <div style="font-size:32px; margin-bottom:12px;">⚠️</div>
+        <p>ไม่สามารถโหลดไฟล์ได้</p>
+        <p style="font-size:11px; opacity:0.6; margin-top:8px;">${err.message}</p>
+      </div>`;
+  }
+}
+
+// ══════════════════════════════
+// RENDER PAGE
+// ══════════════════════════════
+async function renderPage(pageNum) {
+  if (!currentPdf || isRendering) return;
+  isRendering = true;
+
+  const page = await currentPdf.getPage(pageNum);
+  const viewport = page.getViewport({ scale: currentZoom });
+
+  const canvas = document.getElementById('pdf-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+
+  await page.render({ canvasContext: ctx, viewport }).promise;
+
+  canvas.style.display = 'block';
+  document.getElementById('pdf-loading').style.display = 'none';
+  document.getElementById('page-info').textContent = `หน้า ${pageNum} / ${totalPages}`;
+  document.getElementById('btn-prev').disabled = pageNum <= 1;
+  document.getElementById('btn-next').disabled = pageNum >= totalPages;
+  document.getElementById('zoom-level').textContent = Math.round(currentZoom * 100) + '%';
+
+  isRendering = false;
+}
+
+// ══════════════════════════════
+// PAGE NAVIGATION
+// ══════════════════════════════
+function changePage(delta) {
+  const newPage = currentPage + delta;
+  if (newPage < 1 || newPage > totalPages) return;
+  currentPage = newPage;
+  renderPage(currentPage);
+}
+
+function changeZoom(delta) {
+  currentZoom = Math.max(0.5, Math.min(3.0, currentZoom + delta));
+  renderPage(currentPage);
+}
+
+// ══════════════════════════════
+// GLOSSARY SEARCH
+// ══════════════════════════════
+function searchGlossary() {
+  const q = document.getElementById('header-search-input').value.trim();
+  if (!q) return;
+  document.getElementById('glossary-input').value = q;
+  searchGlossaryPanel();
+}
+
+async function searchGlossaryPanel() {
+  const q = document.getElementById('glossary-input').value.trim();
+  if (!q) return;
+
+  // Local search first
+  const lower = q.toLowerCase();
+  const local = glossaryData.filter(g =>
+    g.pali.includes(q) || g.thai.includes(q) ||
+    g.pali.toLowerCase().includes(lower) || g.meaning.includes(q)
+  );
+
+  if (local.length > 0) {
+    buildGlossary(local);
+    return;
+  }
+
+  // AI fallback
+  const aiResult = document.getElementById('ai-result');
+  const aiText = document.getElementById('ai-result-text');
+  aiResult.style.display = 'block';
+  aiText.innerHTML = `<div class="ai-loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>กำลังค้นหา...</span></div>`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: "คุณเป็นผู้เชี่ยวชาญด้านภาษาบาลีและพระไตรปิฎก โดยเฉพาะปฏิสัมภิทามรรค ตอบเป็นภาษาไทย กระชับ ชัดเจน เน้นความหมายในบริบทของปฏิสัมภิทามรรค ตอบในรูปแบบ HTML สั้นๆ ใช้ <strong> สำหรับคำสำคัญ",
+        messages: [{ role: "user", content: `อธิบายความหมายของคำว่า "${q}" ในบริบทปฏิสัมภิทามรรคและพระอภิธรรม รวมถึงนิรุกติศาสตร์บาลีถ้ามี` }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.map(c => c.text || '').join('') || 'ไม่พบข้อมูล';
+    aiText.innerHTML = text;
+  } catch (err) {
+    aiText.innerHTML = `<span style="color: var(--text-light)">ไม่สามารถเชื่อมต่อ AI ได้ในขณะนี้</span>`;
+  }
+}
+
+// Reset glossary to full list
+function resetGlossary() {
+  buildGlossary(glossaryData);
+  document.getElementById('ai-result').style.display = 'none';
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changePage(1);
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') changePage(-1);
+  if (e.key === '+' || e.key === '=') changeZoom(0.15);
+  if (e.key === '-') changeZoom(-0.15);
+});
+
+// ══════════════════════════════
+// INIT
+// ══════════════════════════════
+buildSidebar();
+buildGlossary(glossaryData);
+</script>
+</body>
+</html>
